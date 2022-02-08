@@ -1,0 +1,63 @@
+#!/bin/bash 
+
+#rj name=distributed-ml-test
+#rj queue=test
+#rj features=v100x4
+#rj nodes=1
+#rj taskspernode=1
+
+msg() { echo "$*" >&2; }
+die() { msg "!!! FATAL ERROR: $*"; exit 1; }
+
+# Modules
+module add openmpi/4.1.1-mlnx-gcc
+module add cuda/nccl_2.8.4-1+cuda11.2
+module add cuda/11.2
+
+TEST_NAME="default-test-name"
+VENV_NAME="venv"
+DATA_NAME="mnist.npz"
+EXE_NAME="singleNode.py"
+EXE_PATH="tensorflow" # tensorflow / pytorch
+
+ROOT="/p9/dug/teamhpc/liaml/ml/distributed"
+VENV="${ROOT}/${VENV_NAME}/bin/activate"
+EXE="${ROOT}/${EXE_PATH}/${EXE_NAME}"
+DATA="${ROOT}/data/${DATA_NAME}"
+OUTPUT="${ROOT}/output/${TEST_NAME}"
+
+num_epochs=10
+batch_size=128
+
+msg
+msg "### Test Name: ${TEST_NAME}"
+
+
+# Basic Checks
+[[ -d ${OUTPUT} ]] && die "Output dir (${OUTPUT}) already exists"
+mkdir ${OUTPUT}
+msg "### Output Dir: ${OUTPUT}"
+
+[[ -f ${EXE} ]] || die "Can't find ${EXE}"
+msg "### EXE: ${EXE}"
+
+source "${VENV}"
+[[ -z ${VIRTUAL_ENV} ]] && die "Can't activate ${VENV}"
+msg "### VENV: ${VENV}"
+
+exeArgs="
+    --num-epochs=${num_epochs}
+    --batch-size=${batch_size}
+    --data=${DATA}
+    --output=${OUTPUT}
+"
+
+mpiArgs="
+    -np ${SLURM_NTASKS}
+    -bind-to none -map-by slot
+    -x NCCL_DEBUG=INFO -x LD_LIBRARY_PATH -x PATH
+    -mca pml ucx
+    -mca orte_base_help_aggregate 0
+"
+
+time mpirun $mpiArgs python $EXE $exeArgs
