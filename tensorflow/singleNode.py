@@ -45,11 +45,6 @@ def main():
     output = args.output
     data = args.data
 
-    print('Test')
-    print(output)
-    print(data)
-    
-
     logfile = os.path.join(output, 'logfile')
     tensorboard_dir = os.path.join(output, 'tensorboard')
 
@@ -57,7 +52,6 @@ def main():
     
     # Load dataset
     (train_images, train_labels), (test_images, test_labels) = tf.keras.datasets.mnist.load_data(path=data)
-
 
     # Specify the distribution strategy
     strategy = tf.distribute.MirroredStrategy()
