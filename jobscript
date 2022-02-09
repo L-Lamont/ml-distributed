@@ -3,16 +3,23 @@
 #rj name=distributed-ml-test
 #rj queue=test
 #rj features=v100x4
-#rj nodes=1
-#rj taskspernode=1
+#rj nodes=2
+#rj taskspernode=4
 
 msg() { echo "$*" >&2; }
 die() { msg "!!! FATAL ERROR: $*"; exit 1; }
 
 # Modules
-module add openmpi/4.1.1-mlnx-gcc
-module add cuda/nccl_2.8.4-1+cuda11.2
+module unload cuda
+module unload gcc
+module unload openmpi
+
 module add cuda/11.2
+module add cuda/nccl_2.8.4-1+cuda11.2
+module add openmpi
+
+# Environment Variables
+export TFDS_DATA_DIR="/p9/dug/teamhpc/liaml/ml/distributed/data"
 
 TEST_NAME="default-test-name"
 VENV_NAME="venv"
@@ -31,7 +38,6 @@ batch_size=128
 
 msg
 msg "### Test Name: ${TEST_NAME}"
-
 
 # Basic Checks
 [[ -d ${OUTPUT} ]] && die "Output dir (${OUTPUT}) already exists"
