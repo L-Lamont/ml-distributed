@@ -11,7 +11,7 @@ CMAKE_version="cmake/3.17.0"
 GCC_version="gcc/9.2.0"
 CUDA_version="cuda/nccl_2.8.4-1+cuda11.2"
 
-export HOROVOD_WITH_TENSORFLOW=1
+export HOROVOD_WITHOUT_TENSORFLOW=1
 export HOROVOD_WITH_PYTORCH=1
 export HOROVOD_WITHOUT_MXNET=1
 
@@ -59,11 +59,13 @@ pip install --no-cache-dir --upgrade pip &> "$LOG_DIR/pip.log"
 msg "### Installing torch"
 pip install --no-cache-dir torch &> "$LOG_DIR/torch.log"
 pip install --no-cache-dir torchvision &> "$LOG_DIR/torchvision.log"
+pip install --no-cache-dir torchmetrics &> "$LOG_DIR/torchmetrics.log"
 
 msg "### Installing tensorflow"
 pip install --no-cache-dir tensorflow &> "$LOG_DIR/tensorflow.log" 
 
 msg "### Installing horovod"
-pip install --no-cache-dir horovod &> "$LOG_DIR/horovod.log"
-msg "### Installing mlperf-logging"
-pip install --no-cache-dir -V $MLPERF &> "$LOG_DIR/mlperf.log"
+pip install --no-cache-dir horovod[pytorch,tensorflow] &> "$LOG_DIR/horovod.log"
+
+msg "### Installing pytorch-lightning"
+pip install --no-cache-dir pytorch-lightning==1.5.9 &> "$LOG_DIR/pytorch-lightning.log"
