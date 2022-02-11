@@ -19,8 +19,6 @@ def parse_args():
     add_arg('--batch-size', type=int, help='Set the global batch size', default=32)
     add_arg('--output', help='Set the output directory')
     add_arg('--data', help='Specify the directory with input')
-    add_arg('--num-nodes', type=int, help='Dummy argument not used in horovod')
-    add_arg('--strategy', help='Dummy argument not used in horovod')
 
     return parser.parse_args()
 
@@ -128,13 +126,11 @@ def main():
     num_epochs = args.num_epochs
     batch_size = args.batch_size
     output = args.output
-    num_nodes = args.num_nodes
-    strategy = args.strategy
 
     model = LitMNIST(data_dir=data_dir, batch_size=batch_size)
     trainer = Trainer(
         max_epochs=num_epochs,
-        strategy=strategy,
+        strategy='horovod',
         default_root_dir=output
     )
 
