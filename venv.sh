@@ -11,7 +11,7 @@ CMAKE_version="cmake/3.17.0"
 GCC_version="gcc/9.2.0"
 CUDA_version="cuda/nccl_2.8.4-1+cuda11.2"
 
-export HOROVOD_WITHOUT_TENSORFLOW=1
+export HOROVOD_WITH_TENSORFLOW=1
 export HOROVOD_WITH_PYTORCH=1
 export HOROVOD_WITHOUT_MXNET=1
 
