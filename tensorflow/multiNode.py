@@ -49,20 +49,32 @@ def main():
     tensorboard_dir = os.path.join(output, 'tensorboard')
 
     config_logging(filename=logfile)
+
+    # Allow dynamic memory growth
+    gpus = tf.config.experimental.list_physical_devices('GPU')
+    for gpu in gpus:
+        tf.config.experimental.set_memory_growth(gpu, True)
+
+    # Specify the distribution strategy
+    strategy = tf.distribute.MultiWorkerMirroredStrategy()
     
     # Load dataset
     (train_images, train_labels), (test_images, test_labels) = tf.keras.datasets.mnist.load_data(path=data)
 
+    # Convert dataset to a tensorflow dataset
+    train_data = tf.data.Dataset.from_tensor_slices((train_images, train_labels))
+    test_data = tf.data.Dataset.from_tensor_slices((test_images, test_labels))
 
-    # Specify the distribution strategy
-    cluster_resolver = tf.distribute.cluster_resolver.SlurmClusterResolver(port_base=12345)
-    implementation = tf.distribute.experimental.CommunicationImplementation.NCCL
-    communication_options = tf.distribute.experimental.CommunicationOptions(implementation=implementation)
+    # Update the batchsize
+    train_data = train_data.batch(batch_size)
+    test_data = test_data.batch(batch_size)
 
-    strategy = tf.distribute.MultiWorkerMirroredStrategy(
-        cluster_resolver=cluster_resolver,
-        communication_options=communication_options 
-    )
+    # Update the sharding policy (Because we are using such a single file dataset)
+    options = tf.data.Options()
+    options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.DATA
+
+    train_data = train_data.with_options(options)
+    test_data = test_data.with_options(options)
 
     # Wrap the Model definition and compilation
     with strategy.scope():
@@ -86,14 +98,16 @@ def main():
     ]
 
     model.fit(
-        x=train_images, 
-        y=train_labels, 
+        train_data,
         epochs=num_epochs, 
-        batch_size=batch_size,
         shuffle=True
     ) 
 
-    eval_loss, eval_acc = model.evaluate(x=test_images, y=test_labels)
+    eval_loss, eval_acc = model.evaluate(test_data)
+
+    print()
+    print('Eval_loss\t {}\nEval_accuracy\t {}'.format(eval_loss, eval_acc))
+    print()
 
 
 if __name__ == '__main__':
