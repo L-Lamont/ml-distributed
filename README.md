@@ -12,9 +12,10 @@ A collation of distributed ml examples
     - Horovod
 
 ## Issues
-- mpirun not setting required environment variables in newer versions
-- MultiWorkerMirroredStrategy not working with single input files
-    - They assume you have multiple input files to justify multiple nodes
+- MultiWorkerMirroredStrategy getting CUDA\_ERROR\_OUT\_OF\_MEMORY error
+    - Needed to allow dynamic allocation of memory on GPUs
+- MultiWorkerMirroredStrategy wouldn't work using MNIST dataset
+    - Needed to convert dataset to a tensorflow dataset and update the AUTO\_SHARD\_POLICY to DATA
 - Pytorch lightning version 1.5.10 doesn't pickup horovod
     - Pytorch lightning 1.5.9 works
 - PyTorch complains at TMP being on a network filesystem
