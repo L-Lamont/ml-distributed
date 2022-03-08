@@ -94,7 +94,8 @@ def main():
 
     callbacks = [
         tf.keras.callbacks.TensorBoard(log_dir=tensorboard_dir),
-        tf.keras.callbacks.LearningRateScheduler(decay)
+        tf.keras.callbacks.LearningRateScheduler(decay),
+        hvd.keras.callbacks.MetricAverageCallback()
     ]
 
     model.fit(
@@ -102,10 +103,13 @@ def main():
         y=train_labels,
         epochs=num_epochs,
         batch_size=batch_size,
-        shuffle=True
+        shuffle=True,
+        callbacks=callbacks
     )
 
     eval_loss, eval_acc = model.evaluate(x=test_images, y=test_labels)
+    
+    print("\neval_loss:\t{}\neval_acc:\t{}\n".format(eval_loss, eval_acc))
 
 
 if __name__ == '__main__':

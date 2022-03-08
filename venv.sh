@@ -65,7 +65,7 @@ msg "### Installing tensorflow"
 pip install --no-cache-dir tensorflow &> "$LOG_DIR/tensorflow.log" 
 
 msg "### Installing horovod"
-pip install --no-cache-dir horovod[pytorch,tensorflow] &> "$LOG_DIR/horovod.log"
+pip install --no-cache-dir horovod &> "$LOG_DIR/horovod.log"
 
 msg "### Installing pytorch-lightning"
 pip install --no-cache-dir pytorch-lightning==1.5.9 &> "$LOG_DIR/pytorch-lightning.log"
