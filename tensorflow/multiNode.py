@@ -100,7 +100,8 @@ def main():
     model.fit(
         train_data,
         epochs=num_epochs, 
-        shuffle=True
+        shuffle=True,
+        callbacks=callbacks
     ) 
 
     eval_loss, eval_acc = model.evaluate(test_data)
