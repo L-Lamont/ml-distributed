@@ -69,3 +69,6 @@ pip install --no-cache-dir horovod &> "$LOG_DIR/horovod.log"
 
 msg "### Installing pytorch-lightning"
 pip install --no-cache-dir pytorch-lightning==1.5.9 &> "$LOG_DIR/pytorch-lightning.log"
+
+msg "### Installing flake8"
+pip install --no-cache-dir flake8 &> "$LOG_DIR/flake8.log"
