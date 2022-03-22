@@ -8,6 +8,7 @@ A collation of distributed ml examples
     - Horovod
 - PyTorch
     - Horovod
+    - DDP
 - PyTorch Lightning
     - Horovod
 
